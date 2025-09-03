@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AARADHYA CLASSES — Contact Management & WhatsApp Marketing</title>
+  <meta name="description" content="Dashboard for contacts, groups, WhatsApp integration and simple advertising." />
+  <style>
+    :root{
+      --bg:#0f172a;          /* slate-900 */
+      --panel:#111827;       /* gray-900 */
+      --panel-2:#1f2937;     /* gray-800 */
+      --muted:#94a3b8;       /* slate-400 */
+      --text:#e5e7eb;        /* gray-200 */
+      --brand:#22c55e;       /* green-500 */
+      --brand-2:#16a34a;     /* green-600 */
+      --accent:#60a5fa;      /* blue-400 */
+      --danger:#ef4444;      /* red-500 */
+      --warning:#f59e0b;     /* amber-500 */
+      --shadow: 0 10px 25px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,#0b1220,#0f172a);color:var(--text);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    .wrap{max-width:1100px;margin:auto;padding:24px}
+    header{display:flex;align-items:center;gap:16px;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:40px;height:40px;border-radius:12px;background:radial-gradient(circle at 30% 30%,#34d399,#22d3ee 35%,#6366f1 75%);box-shadow:var(--shadow)}
+    h1{font-size:20px;margin:0}
+    .nav{display:flex;flex-wrap:wrap;gap:8px}
+    .tab{border:1px solid #243040;background:var(--panel-2);padding:8px 12px;border-radius:999px;color:var(--text);cursor:pointer}
+    .tab.active{background:var(--brand);border-color:transparent;color:#09210f;font-weight:700}
+    .grid{display:grid;gap:16px}
+    .grid.cols-4{grid-template-columns:repeat(4,1fr)}
+    @media (max-width:900px){.grid.cols-4{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:540px){.grid.cols-4{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg,#111827,#0b1220);border:1px solid #263244;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+    .kpi{display:flex;align-items:center;justify-content:space-between}
+    .kpi .n{font-size:28px;font-weight:800}
+    .muted{color:var(--muted)}
+    .section{display:none;margin-top:18px}
+    .section.active{display:block}
+    .pill{font-size:12px;border:1px solid #2a3b4f;color:#cbd5e1;border-radius:999px;padding:2px 8px}
+    .btn{appearance:none;border:0;border-radius:12px;background:var(--brand);color:#05280f;padding:10px 14px;font-weight:700;cursor:pointer}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .btn.secondary{background:var(--accent);color:#0a1b2b}
+    .btn.ghost{background:transparent;border:1px solid #2a3b4f;color:#e2e8f0}
+    .btn.danger{background:var(--danger);color:#2b0a0a}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+    input,select,textarea{width:100%;background:#0b1320;border:1px solid #253243;border-radius:12px;color:#e5e7eb;padding:10px 12px}
+    label{font-weight:600;color:#cbd5e1}
+    form .row{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
+    @media (max-width:640px){form .row{grid-template-columns:1fr}}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px dashed #243040;text-align:left}
+    th{color:#9fb1c8;font-weight:700}
+    .chips{display:flex;gap:6px;flex-wrap:wrap}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(5,10,20,.6);backdrop-filter:blur(4px)}
+    .modal.active{display:flex}
+    .modal .box{max-width:520px;width:92%;background:#0b1320;border:1px solid #233347;border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+    .qr{height:180px;border-radius:12px;background:repeating-linear-gradient(45deg,#0e1726,#0e1726 8px,#111c2d 8px,#111c2d 16px);display:grid;place-items:center}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>AARADHYA CLASSES</h1>
+          <div class="muted">Contact Management & WhatsApp Marketing System</div>
+        </div>
+      </div>
+      <nav class="nav" role="tablist" aria-label="Main">
+        <button class="tab active" data-target="dashboard">Dashboard</button>
+        <button class="tab" data-target="profile">My Profile</button>
+        <button class="tab" data-target="contacts">Contacts</button>
+        <button class="tab" data-target="groups">Groups</button>
+        <button class="tab" data-target="whatsapp">WhatsApp</button>
+        <button class="tab" data-target="advertise">Advertise</button>
+      </nav>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section active" aria-labelledby="tab-dashboard">
+      <div class="grid cols-4">
+        <div class="card kpi"><div><div class="muted">Total Contacts</div><div class="n" id="kpiContacts">0</div></div><span class="pill">All</span></div>
+        <div class="card kpi"><div><div class="muted">Groups Created</div><div class="n" id="kpiGroups">0</div></div><span class="pill">Active</span></div>
+        <div class="card kpi"><div><div class="muted">WhatsApp Verified</div><div class="n" id="kpiVerified">0</div></div><span class="pill">Today</span></div>
+        <div class="card kpi"><div><div class="muted">Ads Sent Today</div><div class="n" id="kpiAds">0</div></div><span class="pill">Outbox</span></div>
+      </div>
+
+      <div class="grid" style="margin-top:16px;grid-template-columns:2fr 1fr">
+        <div class="card">
+          <h3 style="margin:0 0 8px 0">Recent Activities</h3>
+          <ul id="recent" class="muted" style="margin:0;padding-left:18px">
+            <li>No recent activities</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin:0 0 8px 0">Contact Categories</h3>
+          <div class="chips">
+            <span class="pill">Parents</span>
+            <span class="pill">Current Students</span>
+            <span class="pill">Prospective Students</span>
+            <span class="pill">Alumni</span>
+            <span class="pill">Teachers</span>
+            <span class="pill">VIP Contacts</span>
+            <span class="pill">Others</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="profile" class="section">
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div class="card">
+          <h2 style="margin-top:0">My Profile</h2>
+          <h3 class="muted" style="margin:0">Snehal Khairnar</h3>
+          <div class="muted">Senior Teacher</div>
+          <div class="muted" style="margin-top:8px">Profile Completion</div>
+          <div aria-label="Profile completion" style="height:10px;background:#091220;border-radius:99px;overflow:hidden">
+            <div style="height:100%;width:80%;background:linear-gradient(90deg,var(--brand),var(--accent))"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin:0 0 8px">Edit Profile Information</h3>
+          <form id="profileForm">
+            <div class="row">
+              <label>Full Name *<input required name="fullName" placeholder="Full Name" value="Snehal Khairnar"></label>
+              <label>Designation *<input required name="designation" placeholder="e.g. Senior Teacher" value="Senior Teacher"></label>
+            </div>
+            <div class="row">
+              <label>Phone Number *<input required name="phone" placeholder="+91xxxxxxxxxx"></label>
+              <label>WhatsApp Number *<input required name="wa" placeholder="+91xxxxxxxxxx"></label>
+            </div>
+            <div class="row">
+              <label>Email Address <input type="email" name="email" placeholder="name@example.com"></label>
+              <label>City <input name="city" placeholder="Nashik"></label>
+            </div>
+            <div class="row">
+              <label>State <input name="state" placeholder="Maharashtra"></label>
+              <label>PIN Code <input name="pin" placeholder="422xxx"></label>
+            </div>
+            <div class="row">
+              <label>Institute Name <input name="inst" placeholder="Aaradhya Classes"></label>
+              <label>Established Year <input name="year" placeholder="2018"></label>
+            </div>
+            <div class="row">
+              <label>Experience (Years) <input name="exp" placeholder="7"></label>
+              <label>Specialization <input name="spec" placeholder="Science / Maths"></label>
+            </div>
+            <label>Subjects Taught <input name="subjects" placeholder="Physics, Chemistry, Maths"></label>
+            <label>Qualifications <input name="qual" placeholder="B.Sc, B.Ed"></label>
+            <label>About Me <textarea name="about" rows="3" placeholder="Write a short bio..."></textarea></label>
+            <div class="toolbar" style="margin-top:8px">
+              <button type="reset" class="btn ghost">Reset</button>
+              <button class="btn">Update Profile</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACTS -->
+    <section id="contacts" class="section">
+      <div class="card">
+        <div class="toolbar" style="justify-content:space-between">
+          <div class="toolbar">
+            <button class="btn" id="addContactBtn">Add Contact</button>
+            <select id="catFilter"><option value="">All Categories</option><option>Parents</option><option>Current Students</option><option>Prospective Students</option><option>Alumni</option><option>Teachers</option><option>VIP Contacts</option><option>Others</option></select>
+            <select id="groupFilter"><option value="">All Groups</option></select>
+          </div>
+          <div><span class="pill" id="selCount">Selected: 0</span></div>
+        </div>
+        <div style="overflow:auto;margin-top:8px">
+          <table id="contactTable" aria-label="Contacts">
+            <thead><tr><th><input type="checkbox" id="selectAll"></th><th>Name</th><th>Phone</th><th>WhatsApp</th><th>Category</th><th>Groups</th><th>Actions</th></tr></thead>
+            <tbody><tr><td colspan="7" class="muted">No contacts yet</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- GROUPS -->
+    <section id="groups" class="section">
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div class="card">
+          <h3 style="margin:0 0 8px">Create Group</h3>
+          <form id="groupForm" class="grid" style="grid-template-columns:1fr">
+            <label>Group Name *<input required name="groupName" placeholder="e.g. Class 10 Parents"></label>
+            <label>Description <textarea name="groupDesc" rows="2" placeholder="Optional"></textarea></label>
+            <button class="btn" type="submit">Save Group</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3 style="margin:0 0 8px">Groups</h3>
+          <ul id="groupList" class="muted" style="margin:0 0 8px 18px"><li>No groups yet</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHATSAPP -->
+    <section id="whatsapp" class="section">
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div class="card">
+          <h3 style="margin:0 0 8px">Import from WhatsApp</h3>
+          <ol class="muted" style="margin-top:0">
+            <li>Open <strong>web.whatsapp.com</strong> and scan QR code.</li>
+            <li>Use WhatsApp export feature to fetch contacts.</li>
+          </ol>
+          <div class="toolbar">
+            <button class="btn secondary" id="simulateImport">Simulate Import</button>
+          </div>
+
+          <h3 style="margin:16px 0 8px">QR Code Scanner</h3>
+          <div class="qr" aria-label="QR Code Scanner"><span class="muted">QR Scanner Interface</span></div>
+          <div class="toolbar" style="margin-top:8px">
+            <button class="btn ghost">Start QR Scanner</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin:0 0 8px">Contact Verification</h3>
+          <div class="toolbar">
+            <button class="btn" id="verifySelected">Verify WhatsApp</button>
+          </div>
+          <div class="card" style="margin-top:12px;background:#0a1220">
+            <h4 style="margin:0 0 6px">Bulk Verification</h4>
+            <p class="muted" style="margin-top:0">Upload a CSV file with phone numbers for bulk verification.</p>
+            <input type="file" accept=".csv" />
+            <button class="btn" style="margin-top:8px">Process Bulk Verification</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADVERTISE -->
+    <section id="advertise" class="section">
+      <div class="card">
+        <h3 style="margin:0 0 8px">Send Advertisements</h3>
+        <div class="grid" style="grid-template-columns:1fr 1fr">
+          <div>
+            <label>Select Groups
+              <select id="adGroups" multiple size="6" style="height:auto"></select>
+            </label>
+            <label style="margin-top:8px">Or Select Individual Contacts
+              <select id="adContacts" multiple size="6" style="height:auto"></select>
+            </label>
+            <div class="muted" id="recipCount" style="margin-top:6px">Selected Recipients: 0</div>
+          </div>
+          <div>
+            <div class="row">
+              <label>Message Template
+                <select id="tmpl">
+                  <option value="">Select Template</option>
+                  <option value="parents">For Parents</option>
+                  <option value="students">For Students</option>
+                  <option value="prospects">For Prospects</option>
+                  <option value="custom">Custom Message</option>
+                </select>
+              </label>
+              <div></div>
+            </div>
+            <label>Message Content
+              <textarea id="msg" rows="6" placeholder="Use {name} for personalization"></textarea>
+            </label>
+            <div class="toolbar" style="margin-top:8px">
+              <button class="btn ghost" id="previewBtn">Preview</button>
+              <button class="btn" id="sendBtn">Send to WhatsApp</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal" id="modal">
+    <div class="box">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <strong>Message Preview</strong>
+        <button class="btn danger" id="closeModal">Close</button>
+      </div>
+      <pre id="preview" style="white-space:pre-wrap"></pre>
+      <div class="toolbar" style="justify-content:flex-end"><button class="btn" id="modalSend">Send to WhatsApp</button></div>
+    </div>
+  </div>
+
+  <script>
+    // --- Simple State ---
+    const state = {
+      contacts: [],
+      groups: [],
+    };
+
+    // --- Tabs ---
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const tgt = btn.dataset.target;
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(tgt).classList.add('active');
+      });
+    });
+
+    // --- Contacts Table Helpers ---
+    const tbody = document.querySelector('#contactTable tbody');
+    const groupFilter = document.getElementById('groupFilter');
+    const adGroups = document.getElementById('adGroups');
+    const adContacts = document.getElementById('adContacts');
+
+    function renderGroups(){
+      const ul = document.getElementById('groupList');
+      ul.innerHTML = '';
+      if(state.groups.length===0){ ul.innerHTML = '<li>No groups yet</li>'; }
+      state.groups.forEach(g => {
+        const li = document.createElement('li');
+        li.textContent = `${g.name} — ${g.desc||''}`;
+        ul.appendChild(li);
+      });
+      // filters & advertise lists
+      groupFilter.innerHTML = '<option value="">All Groups</option>' + state.groups.map(g=>`<option>${g.name}</option>`).join('');
+      adGroups.innerHTML = state.groups.map(g=>`<option>${g.name}</option>`).join('');
+    }
+
+    function renderContacts(){
+      tbody.innerHTML = '';
+      if(state.contacts.length===0){
+        tbody.innerHTML = '<tr><td colspan="7" class="muted">No contacts yet</td></tr>';
+      } else {
+        state.contacts.forEach((c,i)=>{
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><input type="checkbox" class="rowChk" data-i="${i}"></td>
+            <td>${c.name}</td>
+            <td>${c.phone}</td>
+            <td>${c.wa||''}</td>
+            <td>${c.cat}</td>
+            <td>${(c.groups||[]).join(', ')}</td>
+            <td><button class="btn ghost" data-edit="${i}">Edit</button> <button class="btn danger" data-del="${i}">Delete</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+      // KPIs
+      document.getElementById('kpiContacts').textContent = state.contacts.length;
+      document.getElementById('kpiVerified').textContent = state.contacts.filter(c=>c.wa).length;
+      document.getElementById('kpiGroups').textContent = state.groups.length;
+      document.getElementById('kpiAds').textContent = Math.floor((Math.random()*3));
+      // advertise dropdown
+      adContacts.innerHTML = state.contacts.map((c,i)=>`<option value="${i}">${c.name} (${c.phone})</option>`).join('');
+    }
+
+    // Add Contact (lightweight prompt-based to keep file single)
+    document.getElementById('addContactBtn').addEventListener('click', ()=>{
+      const name = prompt('Name'); if(!name) return;
+      const phone = prompt('Phone'); if(!phone) return;
+      const wa = prompt('WhatsApp Number (optional)')||'';
+      const cat = prompt('Category (Parents/Current Students/Prospective Students/Alumni/Teachers/VIP Contacts/Others)','Parents')||'Others';
+      const groups = state.groups.length? (prompt('Add to groups (comma separated)','')||'').split(',').map(s=>s.trim()).filter(Boolean) : [];
+      state.contacts.push({name,phone,wa,cat,groups});
+      renderContacts();
+    });
+
+    // Delete/Edit actions
+    tbody.addEventListener('click', (e)=>{
+      const del = e.target.getAttribute('data-del');
+      const edit = e.target.getAttribute('data-edit');
+      if(del!==null){ state.contacts.splice(Number(del),1); renderContacts(); }
+      if(edit!==null){
+        const i = Number(edit), c = state.contacts[i];
+        const name = prompt('Name', c.name)||c.name;
+        const phone = prompt('Phone', c.phone)||c.phone;
+        const wa = prompt('WhatsApp Number', c.wa)||c.wa;
+        const cat = prompt('Category', c.cat)||c.cat;
+        const groups = prompt('Groups (comma)', (c.groups||[]).join(', '))||'';
+        c.name=name; c.phone=phone; c.wa=wa; c.cat=cat; c.groups=groups.split(',').map(s=>s.trim()).filter(Boolean);
+        renderContacts();
+      }
+    });
+
+    // Group form
+    document.getElementById('groupForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const name = fd.get('groupName').trim();
+      if(!name) return;
+      const desc = (fd.get('groupDesc')||'').trim();
+      state.groups.push({name,desc});
+      e.target.reset();
+      renderGroups();
+    });
+
+    // Simulate Import
+    document.getElementById('simulateImport').addEventListener('click', ()=>{
+      const demo = [
+        {name:'Parent: Mr. Patil', phone:'+91 90000 00001', wa:'+91 90000 00001', cat:'Parents', groups:['Class 10 Parents']},
+        {name:'Student: Aarya G', phone:'+91 90000 00002', wa:'+91 90000 00002', cat:'Current Students', groups:['Class 10 A']},
+        {name:'Prospect: Rahul', phone:'+91 90000 00003', wa:'', cat:'Prospective Students', groups:['Leads']},
+      ];
+      if(!state.groups.length){ state.groups.push({name:'Class 10 Parents'},{name:'Class 10 A'},{name:'Leads'}); }
+      state.contacts.push(...demo);
+      renderGroups();
+      renderContacts();
+      alert('Imported 3 demo contacts.');
+    });
+
+    // Selection counts
+    document.getElementById('selectAll').addEventListener('change', (e)=>{
+      document.querySelectorAll('.rowChk').forEach(ch=>{ ch.checked = e.target.checked; });
+      document.getElementById('selCount').textContent = 'Selected: ' + document.querySelectorAll('.rowChk:checked').length;
+    });
+    tbody.addEventListener('change', ()=>{
+      document.getElementById('selCount').textContent = 'Selected: ' + document.querySelectorAll('.rowChk:checked').length;
+    });
+
+    // Templates
+    const templates = {
+      parents: 'Dear {name}, Admissions open at Aaradhya Classes. Call us today!',
+      students: 'Hi {name}, your next test is on Friday. Be prepared!',
+      prospects: 'Hello {name}, join our free demo class this week at Aaradhya Classes.',
+    };
+    document.getElementById('tmpl').addEventListener('change', (e)=>{
+      document.getElementById('msg').value = templates[e.target.value]||'';
+    });
+
+    // Recipients count
+    function updateRecip(){
+      const c = Array.from(adContacts.selectedOptions).length + Array.from(adGroups.selectedOptions).length;
+      document.getElementById('recipCount').textContent = 'Selected Recipients: ' + c;
+    }
+    adContacts.addEventListener('change', updateRecip);
+    adGroups.addEventListener('change', updateRecip);
+
+    // Preview + Modal
+    const modal = document.getElementById('modal');
+    const preview = document.getElementById('preview');
+    document.getElementById('previewBtn').addEventListener('click', ()=>{
+      preview.textContent = document.getElementById('msg').value.trim()||'(empty message)';
+      modal.classList.add('active');
+    });
+    document.getElementById('closeModal').addEventListener('click', ()=> modal.classList.remove('active'));
+    document.getElementById('modalSend').addEventListener('click', ()=>{
+      modal.classList.remove('active');
+      alert('Pretend sending to WhatsApp…');
+    });
+
+    // Verify selected
+    document.getElementById('verifySelected').addEventListener('click', ()=>{
+      const rows = [...document.querySelectorAll('.rowChk:checked')].map(ch=>Number(ch.dataset.i));
+      if(!rows.length){ alert('Select contacts first.'); return; }
+      rows.forEach(i=>{ if(state.contacts[i].wa) state.contacts[i].verified = true; });
+      alert('Verification simulated for '+rows.length+' contact(s).');
+    });
+
+    // Initial paint
+    renderGroups();
+    renderContacts();
+  </script>
+</body>
+</html>
